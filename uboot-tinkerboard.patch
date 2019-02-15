@@ -1,0 +1,18 @@
+diff --git a/include/configs/tinker_rk3288.h b/include/configs/tinker_rk3288.h
+index 5adae68..6e93fc6 100644
+--- a/include/configs/tinker_rk3288.h
++++ b/include/configs/tinker_rk3288.h
+@@ -19,4 +19,13 @@
+ 
+ #define CONFIG_SYS_MMC_ENV_DEV 1
+ 
++#undef CONFIG_ENV_SIZE
++#define CONFIG_ENV_SIZE (128 * 1024)
++
++#define CONFIG_ENV_IS_IN_FAT
++#define CONFIG_ENV_FAT_INTERFACE "mmc"
++#define CONFIG_ENV_FAT_DEVICE_AND_PART "1"
++#define CONFIG_ENV_FAT_FILE "uboot.env"
++#define CONFIG_SYS_REDUNDAND_ENVIRONMENT
++
+ #endif

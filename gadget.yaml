@@ -1,0 +1,18 @@
+device-tree: rk3288-miniarm.dtb
+device-tree-origin: kernel
+volumes:
+  tinkerboard:
+    bootloader: u-boot
+    schema: mbr
+    structure:
+      - name: u-boot
+        type: bare
+        size: 524288
+        offset: 32768
+        content:
+          - image: boot-assets/u-boot.img
+      - name: system-boot
+        type: 0C
+        filesystem: vfat
+        filesystem-label: system-boot
+        size: 128M

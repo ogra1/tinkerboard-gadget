@@ -1,0 +1,43 @@
+name: tinkerboard
+version: 16-0.1
+summary: Tinkerboard gadget
+description: |
+ Support files for booting a Tinkerboard.
+ This gadget snap supports the Tinkerboard and Tinkerboard S
+type: gadget
+architectures:
+  - build-on: amd64
+    run-on: armhf
+
+confinement: strict
+grade: stable
+
+parts:
+  uboot-tinkerboard:
+    plugin: nil
+    source: git://git.denx.de/u-boot.git
+    source-branch: v2018.11
+    override-build: |
+      git apply ../../../uboot-tinkerboard.patch
+      TCHAINVER="$(wget -q -O - \
+                 https://releases.linaro.org/components/toolchain/binaries/latest-7/arm-linux-gnueabihf/| \
+                 html2text -width 200|grep 'x86_64_arm-linux-gnueabihf.tar.xz '|cut -d' ' -f2)"
+      wget https://releases.linaro.org/components/toolchain/binaries/latest-7/arm-linux-gnueabihf/$TCHAINVER
+      tar xf $TCHAINVER
+      mv $(echo $TCHAINVER|sed 's/.tar.xz$//') toolchain
+      CROSS_COMPILE=$(pwd)/toolchain/bin/arm-linux-gnueabihf- make tinker-rk3288_defconfig
+      CROSS_COMPILE=$(pwd)/toolchain/bin/arm-linux-gnueabihf- make
+      mkdir -p $SNAPCRAFT_PART_INSTALL/boot-assets
+      tools/mkimage -n rk3288 -T rksd -d spl/u-boot-spl-dtb.bin $SNAPCRAFT_PART_INSTALL/boot-assets/u-boot.img
+      cat u-boot-dtb.bin >> $SNAPCRAFT_PART_INSTALL/boot-assets/u-boot.img
+      tools/mkenvimage -r -s 131072 -o $SNAPCRAFT_PART_INSTALL/uboot.env ../../../uboot.env.in
+      ln -s uboot.env $SNAPCRAFT_PART_INSTALL/uboot.conf
+    build-packages:
+      - bc
+      - bison
+      - build-essential
+      - device-tree-compiler
+      - flex
+      - libpython2.7-dev
+      - python-minimal
+      - gcc-arm-linux-gnueabihf
